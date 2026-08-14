@@ -39,7 +39,6 @@
             color: #00d2ff;
             font-weight: bold;
         }
-        /* Styling untuk GIF Spiderman */
         #spidey-overlay {
             display: none;
             position: absolute;
@@ -51,19 +50,32 @@
             width: 300px;
             box-shadow: 0 0 20px #ff0033;
         }
-        /* Styling untuk Foto Love (Gebetan) */
         #love-overlay {
             display: none;
             position: absolute;
             transform: translate(-50%, -50%);
             z-index: 5;
             pointer-events: none;
-            border-radius: 50%; /* Bikin fotonya jadi bulat */
+            border-radius: 50%;
             width: 180px;
             height: 180px;
-            object-fit: cover; /* Biar foto gak gepeng */
+            object-fit: cover;
             box-shadow: 0 0 25px #ff0066;
             opacity: 0.9;
+        }
+        /* Tambahan Styling untuk Teks I LOVE YOU */
+        #iloveyou-overlay {
+            display: none;
+            position: absolute;
+            transform: translate(-50%, 50%); /* Posisinya agak di bawah tangan */
+            z-index: 5;
+            color: #ff66ff;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 15px #ff66ff, 0 0 30px #ff00ff, 0 0 5px #fff;
+            pointer-events: none;
+            text-align: center;
+            white-space: nowrap;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -79,6 +91,8 @@
     <img id="spidey-overlay" src="https://media.giphy.com/media/SF9Z0shNT07T2/giphy.gif" alt="Spider-Man Web">
     
     <img id="love-overlay" src="sekolah.jpg" alt="Love Photo">
+    
+    <div id="iloveyou-overlay">I LOVE YOU<br>🫶</div>
 
     <video id="webcam" autoplay playsinline muted></video>
 
@@ -86,7 +100,8 @@
         const NUM_PARTICLES = 1500;
         let scene, camera, renderer, particleSystem, geometry;
         let currentPos, targetPos;
-        let posSpace, posPlanet, posHeart, posWeb; 
+        // Tambahkan variabel posText
+        let posSpace, posPlanet, posHeart, posWeb, posText; 
         let currentMode = 1;
         
         let targetHandX = 0, targetHandY = 0;
@@ -131,6 +146,7 @@
             posPlanet = new Float32Array(NUM_PARTICLES * 3);
             posHeart = new Float32Array(NUM_PARTICLES * 3);
             posWeb = new Float32Array(NUM_PARTICLES * 3);
+            posText = new Float32Array(NUM_PARTICLES * 3); // Shape teks
 
             // Kosmos
             for (let i = 0; i < NUM_PARTICLES * 3; i += 3) {
@@ -193,6 +209,41 @@
                     posWeb[idx+2] = (Math.random() - 0.5) * 0.2;
                 }
             }
+
+            // Teks "I LOVE YOU" via Virtual Canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = 250;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 35px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('I LOVE', 125, 40);
+            ctx.fillText('YOU', 125, 80);
+            
+            const imgData = ctx.getImageData(0, 0, 250, 120).data;
+            const textPoints = [];
+            
+            for(let y = 0; y < 120; y += 2) {
+                for(let x = 0; x < 250; x += 2) {
+                    const alpha = imgData[(y * 250 + x) * 4 + 3];
+                    if(alpha > 128) {
+                        textPoints.push({x: (x - 125) * 0.05, y: -(y - 60) * 0.05});
+                    }
+                }
+            }
+            
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                const idx = i * 3;
+                if (textPoints.length > 0) {
+                    const pt = textPoints[i % textPoints.length];
+                    posText[idx] = pt.x;
+                    posText[idx+1] = pt.y + 0.5;
+                    // Bikin efek ketebalan biar partikel teksnya ada volume 3D-nya
+                    posText[idx+2] = (Math.random() - 0.5) * 0.6; 
+                }
+            }
         }
 
         function animate() {
@@ -207,13 +258,22 @@
             }
             geometry.attributes.position.needsUpdate = true;
 
+            // Rotasi Partikel
             if (currentMode === 1) rotationAngle += 0.005;
             else if (currentMode === 2) rotationAngle += 0.02;
             else if (currentMode === 3) rotationAngle += 0.015;
             else if (currentMode === 4) rotationAngle -= 0.01;
+            // Mode 5 (Teks I LOVE YOU) sengaja gak diputar y-nya biar tulisannya kebaca
+            else if (currentMode === 5) rotationAngle = 0; 
 
-            particleSystem.rotation.y = rotationAngle;
-            if (currentMode === 4) particleSystem.rotation.x = 0; 
+            if (currentMode === 5) {
+                // Goyang sedikit biar partikel teks hidup
+                particleSystem.rotation.y = Math.sin(Date.now() * 0.001) * 0.2; 
+                particleSystem.rotation.x = 0;
+            } else {
+                particleSystem.rotation.y = rotationAngle;
+                if (currentMode === 4) particleSystem.rotation.x = 0;
+            }
 
             if (currentMode !== 1) {
                 particleSystem.position.x = handX;
@@ -243,18 +303,30 @@
 
             const jumlahJari = berdiri.filter(Boolean).length;
 
+            // Mode 5: PEACE (Telunjuk dan Tengah berdiri, sisanya turun)
+            if (berdiri[0] && berdiri[1] && !berdiri[2] && !berdiri[3]) {
+                return 5;
+            }
+
+            // Mode 4: SPIDER-MAN
             if (berdiri[0] && !berdiri[1] && !berdiri[2] && berdiri[3]) {
                 return 4; 
             }
 
+            // Mode 3: BENTUK HATI (Semua turun/kepal)
             if (jumlahJari === 0) return 3; 
+            
+            // Mode 2: SATURNUS (Telunjuk doang)
             if (berdiri[0] && !berdiri[1] && !berdiri[2] && !berdiri[3]) return 2; 
+            
+            // Mode 1: KOSMOS (Default / Terbuka)
             return 1; 
         }
 
         function onResults(results) {
             const spideyImg = document.getElementById('spidey-overlay');
             const loveImg = document.getElementById('love-overlay');
+            const iloveyouText = document.getElementById('iloveyou-overlay');
             const label = document.getElementById('mode-label');
 
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
@@ -263,33 +335,32 @@
 
                 const wrist = landmarks[0];
                 
-                // Kordinat 3D untuk partikel
                 targetHandX = (0.5 - wrist.x) * 10;
                 targetHandY = (0.5 - wrist.y) * 8;
                 
-                // Kordinat 2D (Layar HTML) biar gambar ngikutin tangan
                 const screenX = (1 - wrist.x) * window.innerWidth;
                 const screenY = wrist.y * window.innerHeight;
+
+                // Sembunyikan semua elemen overlay di awal agar bisa diaktifkan sesuai mode
+                spideyImg.style.display = "none";
+                loveImg.style.display = "none";
+                iloveyouText.style.display = "none";
 
                 if (currentMode === 1) {
                     targetPos = posSpace;
                     label.innerText = "KOSMOS (Terbuka)";
                     particleSystem.material.color.setHex(0x00d2ff);
-                    spideyImg.style.display = "none";
-                    loveImg.style.display = "none";
+                    
                 } else if (currentMode === 2) {
                     targetPos = posPlanet;
                     label.innerText = "SATURNUS (Telunjuk)";
                     particleSystem.material.color.setHex(0xffaa00);
-                    spideyImg.style.display = "none";
-                    loveImg.style.display = "none";
+                    
                 } else if (currentMode === 3) {
                     targetPos = posHeart;
                     label.innerText = "BENTUK HATI (Kepal)";
                     particleSystem.material.color.setHex(0xff0066);
-                    spideyImg.style.display = "none";
                     
-                    // Munculkan Foto Love & bikin posisinya ngikutin tangan
                     loveImg.style.display = "block";
                     loveImg.style.left = `${screenX}px`;
                     loveImg.style.top = `${screenY}px`;
@@ -298,12 +369,20 @@
                     targetPos = posWeb;
                     label.innerText = "SPIDER-MAN (Jaring!)";
                     particleSystem.material.color.setHex(0xff0033);
-                    loveImg.style.display = "none";
                     
-                    // Munculkan GIF Spidey & bikin posisinya ngikutin tangan
                     spideyImg.style.display = "block"; 
                     spideyImg.style.left = `${screenX}px`;
                     spideyImg.style.top = `${screenY}px`;
+                    
+                } else if (currentMode === 5) {
+                    targetPos = posText;
+                    label.innerText = "PEACE (I Love You)";
+                    particleSystem.material.color.setHex(0xff66ff); // Warna Pink Muda
+                    
+                    // Munculkan Teks I LOVE YOU
+                    iloveyouText.style.display = "block";
+                    iloveyouText.style.left = `${screenX}px`;
+                    iloveyouText.style.top = `${screenY}px`;
                 }
             }
         }
@@ -352,3 +431,4 @@
     </script>
 </body>
 </html>
+
