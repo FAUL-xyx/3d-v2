@@ -3,42 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Hand Gesture Particles - Love Edition</title>
+    <title>3D Hand Gesture Particles - Premium Edition</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #000;
-            font-family: sans-serif;
+            background-color: #050508; 
+            font-family: 'Poppins', sans-serif;
         }
-        #webcam {
+
+        /* Layar Pembuka (Start Overlay) */
+        #start-screen {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 120px;
-            height: 90px;
-            transform: scaleX(-1);
-            border-radius: 8px;
-            border: 2px solid #00d2ff;
-            z-index: 10;
-            object-fit: cover;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: white;
+            transition: opacity 0.5s ease;
         }
+
+        #start-screen h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #start-screen p {
+            font-size: 14px;
+            font-weight: 300;
+            opacity: 0.7;
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        #start-btn {
+            background: linear-gradient(90deg, #ff0066, #ff3399);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 0, 102, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Kotak Info */
         #info {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             color: #fff;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 15px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 12px 30px;
+            border-radius: 50px;
             font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 1px;
             z-index: 10;
             pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: none; /* Disembunyikan sebelum klik mulai */
         }
+
         .mode-text {
-            color: #00d2ff;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 16px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
         }
+
+        #status-text {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Container Webcam */
+        #webcam-container {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            display: none; /* Disembunyikan sebelum klik mulai */
+        }
+
+        #webcam {
+            width: 130px;
+            height: 95px;
+            transform: scaleX(-1);
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Overlays */
         #spidey-overlay {
             display: none;
             position: absolute;
@@ -48,39 +145,40 @@
             border-radius: 15px;
             opacity: 0.85;
             width: 300px;
-            box-shadow: 0 0 20px #ff0033;
+            box-shadow: 0 0 30px rgba(255, 0, 51, 0.6);
         }
-        #love-overlay {
-    display: none;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    pointer-events: none;
-    width: 180px;
-    height: 180px;
-    object-fit: cover;
-    opacity: 0.95;
-    -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E");
-    -webkit-mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E");
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-    filter: drop-shadow(0 0 15px #ff0066);
-}
 
+        #love-overlay {
+            display: none;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            pointer-events: none;
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            opacity: 0.95;
+            -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E");
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E");
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            filter: drop-shadow(0 0 15px #ff0066);
         }
-        /* Tambahan Styling untuk Teks I LOVE YOU */
+
         #iloveyou-overlay {
             display: none;
             position: absolute;
-            transform: translate(-50%, 50%); /* Posisinya agak di bawah tangan */
+            transform: translate(-50%, 50%);
             z-index: 5;
-            color: #ff66ff;
-            font-size: 32px;
-            font-weight: bold;
+            color: #ffb3ff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
             text-shadow: 0 0 15px #ff66ff, 0 0 30px #ff00ff, 0 0 5px #fff;
             pointer-events: none;
             text-align: center;
@@ -92,24 +190,32 @@
 </head>
 <body>
 
+    <audio id="bg-music" src="lagu.mp3" loop></audio>
+
+    <div id="start-screen">
+        <h1>Hand Gesture AI</h1>
+        <p>Izinkan akses kamera dan nikmati interaksi visual 3D.</p>
+        <button id="start-btn">Mulai Sekarang</button>
+    </div>
+
     <div id="info">
-        MODE: <span id="mode-label" class="mode-text">KOSMOS (Terbuka)</span><br>
+        <span style="font-size: 11px; opacity: 0.8; text-transform: uppercase;">Deteksi Gestur</span><br>
+        <span id="mode-label" class="mode-text">KOSMOS</span>
         <small id="status-text">Memuat kamera...</small>
     </div>
     
     <img id="spidey-overlay" src="https://media.giphy.com/media/SF9Z0shNT07T2/giphy.gif" alt="Spider-Man Web">
-    
     <img id="love-overlay" src="sekolah.jpg" alt="Love Photo">
-    
     <div id="iloveyou-overlay">I LOVE YOU<br>🫶</div>
 
-    <video id="webcam" autoplay playsinline muted></video>
+    <div id="webcam-container">
+        <video id="webcam" autoplay playsinline muted></video>
+    </div>
 
     <script>
         const NUM_PARTICLES = 1500;
         let scene, camera, renderer, particleSystem, geometry;
         let currentPos, targetPos;
-        // Tambahkan variabel posText
         let posSpace, posPlanet, posHeart, posWeb, posText; 
         let currentMode = 1;
         
@@ -155,16 +261,14 @@
             posPlanet = new Float32Array(NUM_PARTICLES * 3);
             posHeart = new Float32Array(NUM_PARTICLES * 3);
             posWeb = new Float32Array(NUM_PARTICLES * 3);
-            posText = new Float32Array(NUM_PARTICLES * 3); // Shape teks
+            posText = new Float32Array(NUM_PARTICLES * 3);
 
-            // Kosmos
             for (let i = 0; i < NUM_PARTICLES * 3; i += 3) {
                 posSpace[i] = (Math.random() - 0.5) * 10;
                 posSpace[i+1] = (Math.random() - 0.5) * 10;
                 posSpace[i+2] = (Math.random() - 0.5) * 10;
             }
 
-            // Saturnus
             const numSphere = 600;
             for (let i = 0; i < NUM_PARTICLES; i++) {
                 const idx = i * 3;
@@ -186,22 +290,18 @@
                 }
             }
 
-            // Hati
             for (let i = 0; i < NUM_PARTICLES; i++) {
                 const idx = i * 3;
                 const t = (Math.random() * 2 - 1) * Math.PI;
                 const p = (Math.random() * 2 - 1) * Math.PI;
-
                 const x = 2.0 * Math.pow(Math.sin(t), 3);
                 const y = 2.0 * Math.cos(t) - 0.7 * Math.cos(2*t) - 0.3 * Math.cos(3*t) - 0.1 * Math.cos(4*t);
                 const z = Math.sin(p) * 0.4;
-
                 posHeart[idx] = x * 1.0; 
                 posHeart[idx+1] = (y * 1.0) + 0.5;
                 posHeart[idx+2] = z;
             }
 
-            // Spider Web
             for (let i = 0; i < NUM_PARTICLES; i++) {
                 const idx = i * 3;
                 if (i < 800) {
@@ -219,7 +319,6 @@
                 }
             }
 
-            // Teks "I LOVE YOU" via Virtual Canvas
             const canvas = document.createElement('canvas');
             canvas.width = 250;
             canvas.height = 120;
@@ -249,7 +348,6 @@
                     const pt = textPoints[i % textPoints.length];
                     posText[idx] = pt.x;
                     posText[idx+1] = pt.y + 0.5;
-                    // Bikin efek ketebalan biar partikel teksnya ada volume 3D-nya
                     posText[idx+2] = (Math.random() - 0.5) * 0.6; 
                 }
             }
@@ -267,16 +365,13 @@
             }
             geometry.attributes.position.needsUpdate = true;
 
-            // Rotasi Partikel
             if (currentMode === 1) rotationAngle += 0.005;
             else if (currentMode === 2) rotationAngle += 0.02;
             else if (currentMode === 3) rotationAngle += 0.015;
             else if (currentMode === 4) rotationAngle -= 0.01;
-            // Mode 5 (Teks I LOVE YOU) sengaja gak diputar y-nya biar tulisannya kebaca
             else if (currentMode === 5) rotationAngle = 0; 
 
             if (currentMode === 5) {
-                // Goyang sedikit biar partikel teks hidup
                 particleSystem.rotation.y = Math.sin(Date.now() * 0.001) * 0.2; 
                 particleSystem.rotation.x = 0;
             } else {
@@ -312,24 +407,18 @@
 
             const jumlahJari = berdiri.filter(Boolean).length;
 
-            // Mode 5: PEACE (Telunjuk dan Tengah berdiri, sisanya turun)
-            if (berdiri[0] && berdiri[1] && !berdiri[2] && !berdiri[3]) {
-                return 5;
-            }
-
-            // Mode 4: SPIDER-MAN
-            if (berdiri[0] && !berdiri[1] && !berdiri[2] && berdiri[3]) {
-                return 4; 
-            }
-
-            // Mode 3: BENTUK HATI (Semua turun/kepal)
+            if (berdiri[0] && berdiri[1] && !berdiri[2] && !berdiri[3]) return 5;
+            if (berdiri[0] && !berdiri[1] && !berdiri[2] && berdiri[3]) return 4; 
             if (jumlahJari === 0) return 3; 
-            
-            // Mode 2: SATURNUS (Telunjuk doang)
             if (berdiri[0] && !berdiri[1] && !berdiri[2] && !berdiri[3]) return 2; 
-            
-            // Mode 1: KOSMOS (Default / Terbuka)
             return 1; 
+        }
+
+        function ubahWarnaTeksMode(color1, color2) {
+            const modeLabel = document.getElementById('mode-label');
+            modeLabel.style.background = `linear-gradient(90deg, ${color1}, ${color2})`;
+            modeLabel.style.webkitBackgroundClip = "text";
+            modeLabel.style.webkitTextFillColor = "transparent";
         }
 
         function onResults(results) {
@@ -337,38 +426,56 @@
             const loveImg = document.getElementById('love-overlay');
             const iloveyouText = document.getElementById('iloveyou-overlay');
             const label = document.getElementById('mode-label');
+            const statusText = document.getElementById('status-text');
+            const bgMusic = document.getElementById('bg-music');
 
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                statusText.style.display = 'none'; 
+                
                 const landmarks = results.multiHandLandmarks[0];
                 currentMode = hitungModeGestur(landmarks);
 
+                // --- LOGIKA MUSIK ---
+                // Lagu akan dimainkan (play) jika gestur Hati (3) atau Peace (5)
+                if (currentMode === 3 || currentMode === 5) {
+                    if (bgMusic.paused) {
+                        bgMusic.play().catch(e => console.log("Audio diblokir browser"));
+                    }
+                } else {
+                    // Lagu akan berhenti (pause) jika gestur lain
+                    if (!bgMusic.paused) {
+                        bgMusic.pause();
+                    }
+                }
+
                 const wrist = landmarks[0];
-                
                 targetHandX = (0.5 - wrist.x) * 10;
                 targetHandY = (0.5 - wrist.y) * 8;
                 
                 const screenX = (1 - wrist.x) * window.innerWidth;
                 const screenY = wrist.y * window.innerHeight;
 
-                // Sembunyikan semua elemen overlay di awal agar bisa diaktifkan sesuai mode
                 spideyImg.style.display = "none";
                 loveImg.style.display = "none";
                 iloveyouText.style.display = "none";
 
                 if (currentMode === 1) {
                     targetPos = posSpace;
-                    label.innerText = "KOSMOS (Terbuka)";
+                    label.innerText = "KOSMOS TERBUKA";
                     particleSystem.material.color.setHex(0x00d2ff);
+                    ubahWarnaTeksMode("#00d2ff", "#3a7bd5");
                     
                 } else if (currentMode === 2) {
                     targetPos = posPlanet;
-                    label.innerText = "SATURNUS (Telunjuk)";
+                    label.innerText = "ORBIT SATURNUS";
                     particleSystem.material.color.setHex(0xffaa00);
+                    ubahWarnaTeksMode("#ffaa00", "#ff7700");
                     
                 } else if (currentMode === 3) {
                     targetPos = posHeart;
-                    label.innerText = "BENTUK HATI (Kepal)";
+                    label.innerText = "BENTUK HATI";
                     particleSystem.material.color.setHex(0xff0066);
+                    ubahWarnaTeksMode("#ff0066", "#ff3399");
                     
                     loveImg.style.display = "block";
                     loveImg.style.left = `${screenX}px`;
@@ -376,8 +483,9 @@
                     
                 } else if (currentMode === 4) {
                     targetPos = posWeb;
-                    label.innerText = "SPIDER-MAN (Jaring!)";
+                    label.innerText = "SPIDER-MAN";
                     particleSystem.material.color.setHex(0xff0033);
+                    ubahWarnaTeksMode("#ff0033", "#cc0000");
                     
                     spideyImg.style.display = "block"; 
                     spideyImg.style.left = `${screenX}px`;
@@ -385,14 +493,19 @@
                     
                 } else if (currentMode === 5) {
                     targetPos = posText;
-                    label.innerText = "PEACE (I Love You)";
-                    particleSystem.material.color.setHex(0xff66ff); // Warna Pink Muda
+                    label.innerText = "I LOVE YOU";
+                    particleSystem.material.color.setHex(0xff66ff);
+                    ubahWarnaTeksMode("#ff66ff", "#cc33ff");
                     
-                    // Munculkan Teks I LOVE YOU
                     iloveyouText.style.display = "block";
                     iloveyouText.style.left = `${screenX}px`;
                     iloveyouText.style.top = `${screenY}px`;
                 }
+            } else {
+                statusText.style.display = 'block';
+                statusText.innerText = "Arahkan tangan ke kamera";
+                // Matikan musik kalau tangan tidak terdeteksi
+                if (!bgMusic.paused) bgMusic.pause();
             }
         }
 
@@ -418,7 +531,7 @@
                     video: { facingMode: 'user', width: 480, height: 360 }
                 });
                 videoElement.srcObject = stream;
-                statusText.innerText = "Arahkan kamera ke tangan";
+                statusText.innerText = "Menyiapkan AI...";
                 
                 videoElement.onloadedmetadata = () => {
                     async function processFrame() {
@@ -430,13 +543,34 @@
                     processFrame();
                 };
             } catch (err) {
-                statusText.innerText = "Kamera diblokir / tidak terdeteksi";
-                alert("Izinkan akses kamera di browser HP Anda!");
+                statusText.innerText = "Kamera diblokir / error";
+                alert("Izinkan akses kamera di browser kamu ya!");
             }
         }
 
         initThree();
-        startCamera();
+
+        // TOMBOL MULAI UNTUK MENGAKTIFKAN KAMERA & AUDIO
+        document.getElementById('start-btn').addEventListener('click', function() {
+            // Sembunyikan layar pembuka
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'none';
+            }, 500);
+
+            // Munculkan UI
+            document.getElementById('info').style.display = 'block';
+            document.getElementById('webcam-container').style.display = 'block';
+
+            // Mainkan audio kosong sebentar (trik buka blokir autoplay)
+            const bgMusic = document.getElementById('bg-music');
+            bgMusic.play().then(() => {
+                bgMusic.pause();
+            }).catch(e => console.log(e));
+
+            // Mulai Kamera
+            startCamera();
+        });
     </script>
 </body>
 </html>
