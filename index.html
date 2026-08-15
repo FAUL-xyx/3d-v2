@@ -17,7 +17,7 @@
         body { margin: 0; overflow: hidden; background-color: #050508; font-family: 'Poppins', sans-serif; }
 
         /* --- LAYAR PEMBUKA --- */
-        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 8, 0.9); backdrop-filter: blur(15px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; transition: opacity 0.5s ease; }
+        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 8, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; transition: opacity 0.5s ease; }
         #start-screen h1 { font-size: 28px; font-weight: 700; letter-spacing: 2px; margin-bottom: 5px; background: linear-gradient(90deg, #ff0066, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         #start-screen p { font-size: 14px; font-weight: 300; opacity: 0.8; margin-bottom: 20px; }
         #name-input { padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-family: 'Poppins', sans-serif; font-size: 14px; width: 250px; text-align: center; margin-bottom: 25px; outline: none; }
@@ -26,17 +26,17 @@
         #start-btn:active { transform: scale(0.95); }
 
         /* --- UI & TOMBOL --- */
-        #info { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); padding: 12px 30px; border-radius: 50px; font-size: 14px; font-weight: 300; letter-spacing: 1px; z-index: 10; pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); text-align: center; display: none; }
+        #info { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 30px; border-radius: 50px; font-size: 14px; font-weight: 300; letter-spacing: 1px; z-index: 10; pointer-events: none; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); text-align: center; display: none; }
         .mode-text { font-weight: 700; font-size: 16px; background: linear-gradient(90deg, #00d2ff, #3a7bd5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
         #status-text { display: block; margin-top: 4px; font-size: 12px; opacity: 0.7; }
         
-        #capture-btn { position: absolute; top: 30px; right: 30px; z-index: 20; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 10px 20px; border-radius: 30px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); display: none; transition: transform 0.2s;}
+        #capture-btn { position: absolute; top: 30px; right: 30px; z-index: 20; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 10px 20px; border-radius: 30px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); display: none; transition: transform 0.2s; }
         #capture-btn:hover { transform: scale(1.05); }
 
         /* --- PANDUAN GESTUR --- */
         #guide-wrapper { position: absolute; bottom: 25px; left: 25px; z-index: 15; display: none; }
         #guide-btn { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 10px 20px; border-radius: 30px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        #guide-panel { position: absolute; bottom: 50px; left: 0; background: rgba(10, 10, 15, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 15px; width: 250px; color: #fff; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all 0.3s ease; }
+        #guide-panel { position: absolute; bottom: 50px; left: 0; background: rgba(10, 10, 15, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 15px; width: 250px; color: #fff; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         #guide-panel.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .guide-item { display: flex; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
         .guide-emoji { font-size: 18px; background: rgba(255,255,255,0.1); padding: 6px; border-radius: 8px; }
@@ -48,13 +48,10 @@
         #webcam, #output_canvas { position: absolute; top: 5px; left: 5px; width: 130px; height: 95px; transform: scaleX(-1); border-radius: 12px; object-fit: cover; }
         #output_canvas { z-index: 11; pointer-events: none; }
 
-        /* --- OVERLAYS --- */
+        /* --- OVERLAYS & ANIMASI --- */
         #spidey-overlay { display: none; position: absolute; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; border-radius: 15px; opacity: 0.85; width: 300px; box-shadow: 0 0 30px rgba(255, 0, 51, 0.6); }
         
         #love-overlay { display: none; position: absolute; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; width: 180px; height: 180px; object-fit: cover; opacity: 0.95; -webkit-mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E"); mask-size: contain; filter: drop-shadow(0 0 15px #ff0066); }
-
-        /* Bunga Mawar Overlay */
-        #rose-overlay { display: none; position: absolute; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; width: 140px; object-fit: contain; opacity: 0.95; filter: drop-shadow(0 0 25px rgba(255, 0, 51, 0.8)); }
 
         .heartbeat-anim { animation: pulse 1s infinite; }
         @keyframes pulse {
@@ -68,7 +65,6 @@
 </head>
 <body>
 
-    <!-- Audio Files -->
     <audio id="bg-music" src="lagu.mp3" loop></audio>
     <audio id="thwip-sfx" src="thwip.mp3"></audio>
     <audio id="space-sfx" src="space.mp3" loop></audio>
@@ -95,15 +91,14 @@
             <div class="guide-item"><div class="guide-emoji">✊</div><div><span class="guide-title" style="color: #ff0066;">Mengepal</span><span class="guide-desc">Hati, Detak & Lagu</span></div></div>
             <div class="guide-item"><div class="guide-emoji">🤟</div><div><span class="guide-title" style="color: #ff0033;">Spider-Man</span><span class="guide-desc">Jaring & Efek Suara</span></div></div>
             <div class="guide-item"><div class="guide-emoji">✌️</div><div><span class="guide-title" style="color: #ff66ff;">Peace</span><span class="guide-desc">Teks Nama Spesial & Lagu</span></div></div>
-            <div class="guide-item"><div class="guide-emoji">🤙</div><div><span class="guide-title" style="color: #00ff66;">Kelingking</span><span class="guide-desc">Bunga Mawar & Aura Magis</span></div></div>
+            <div class="guide-item"><div class="guide-emoji">🤙</div><div><span class="guide-title" style="color: #00ff66;">Kelingking</span><span class="guide-desc">Bunga Mawar 3D & Lagu</span></div></div>
         </div>
         <button id="guide-btn"><span>ℹ️</span> Panduan</button>
     </div>
     
     <img id="spidey-overlay" src="https://media.giphy.com/media/SF9Z0shNT07T2/giphy.gif" alt="Spider-Man Web">
     <img id="love-overlay" src="sekolah.jpg" alt="Love Photo">
-    <!-- Overlay Bunga Mawar -->
-    <img id="rose-overlay" src="mawar.jpg" alt="Mawar"> 
+    
     <div id="iloveyou-overlay">I LOVE YOU<br><span id="dynamic-name">SAYANG</span> 🫶</div>
 
     <div id="webcam-container">
@@ -140,7 +135,7 @@
             geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.BufferAttribute(currentPos, 3));
 
-            // GPU Shader Material (Partikel Premium)
+            // ShaderMaterial (GPU Particles Mantap)
             const uniforms = {
                 uTime: { value: 0 },
                 uColor: { value: new THREE.Color(0x00d2ff) }, 
@@ -201,7 +196,7 @@
             posHeart = new Float32Array(NUM_PARTICLES * 3);
             posWeb = new Float32Array(NUM_PARTICLES * 3);
             posText = new Float32Array(NUM_PARTICLES * 3);
-            posRose = new Float32Array(NUM_PARTICLES * 3); // Shape Baru: Pusaran Bunga Mawar
+            posRose = new Float32Array(NUM_PARTICLES * 3); // Bentuk Partikel Mawar 3D
 
             for (let i = 0; i < NUM_PARTICLES * 3; i += 3) {
                 posSpace[i] = (Math.random() - 0.5) * 10; posSpace[i+1] = (Math.random() - 0.5) * 10; posSpace[i+2] = (Math.random() - 0.5) * 10;
@@ -209,6 +204,8 @@
 
             for (let i = 0; i < NUM_PARTICLES; i++) {
                 const idx = i * 3;
+                
+                // 1. Saturnus
                 if (i < 600) {
                     const u = Math.random(), v = Math.random(), theta = u * 2.0 * Math.PI, phi = Math.acos(2.0 * v - 1.0);
                     posPlanet[idx] = 1.3 * Math.sin(phi) * Math.cos(theta); posPlanet[idx+1] = 1.3 * Math.sin(phi) * Math.sin(theta); posPlanet[idx+2] = 1.3 * Math.cos(phi);
@@ -217,13 +214,13 @@
                     posPlanet[idx] = r * Math.cos(theta); posPlanet[idx+1] = (Math.random() - 0.5) * 0.2; posPlanet[idx+2] = r * Math.sin(theta);
                 }
 
-                // Heart
+                // 2. Hati
                 const t = (Math.random() * 2 - 1) * Math.PI, p = (Math.random() * 2 - 1) * Math.PI;
                 posHeart[idx] = (2.0 * Math.pow(Math.sin(t), 3)) * 1.0; 
                 posHeart[idx+1] = ((2.0 * Math.cos(t) - 0.7 * Math.cos(2*t) - 0.3 * Math.cos(3*t) - 0.1 * Math.cos(4*t)) * 1.0) + 0.5; 
                 posHeart[idx+2] = Math.sin(p) * 0.4;
 
-                // Web
+                // 3. Web
                 if (i < 800) {
                     const angle = Math.floor(Math.random() * 8) * (Math.PI / 4), radius = Math.random() * 5;
                     posWeb[idx] = radius * Math.cos(angle); posWeb[idx+1] = radius * Math.sin(angle); posWeb[idx+2] = (Math.random() - 0.5) * 0.2;
@@ -232,13 +229,20 @@
                     posWeb[idx] = ring * Math.cos(angle); posWeb[idx+1] = ring * Math.sin(angle); posWeb[idx+2] = (Math.random() - 0.5) * 0.2;
                 }
 
-                // Magical Aura (Bunga Mawar) - Pusaran memanjang ke atas
-                const auraHeight = (i / NUM_PARTICLES) * 4 - 2; // dari -2 ke 2
-                const auraRadius = (Math.random() * 1.5) + (2 - Math.abs(auraHeight)) * 0.5; 
-                const auraAngle = i * 0.5; // Spiral
-                posRose[idx] = auraRadius * Math.cos(auraAngle);
-                posRose[idx+1] = auraHeight;
-                posRose[idx+2] = auraRadius * Math.sin(auraAngle);
+                // 4. Mawar 3D
+                if (i < 1100) {
+                    const phi = (i / 1100) * Math.PI * 2 * 4; 
+                    const r = Math.sin(phi * 1.5) * 1.2 + 0.5; 
+                    const heightFactor = Math.pow((i / 1100), 0.5); 
+                    posRose[idx] = r * Math.cos(phi) * heightFactor * 1.5;
+                    posRose[idx+1] = (i / 1100) * 2.0 - 0.5; 
+                    posRose[idx+2] = r * Math.sin(phi) * heightFactor * 1.5;
+                } else {
+                    const stemProgress = (i - 1100) / (NUM_PARTICLES - 1100);
+                    posRose[idx] = Math.sin(stemProgress * Math.PI * 4) * 0.1; 
+                    posRose[idx+1] = -stemProgress * 3.0 - 0.5; 
+                    posRose[idx+2] = Math.cos(stemProgress * Math.PI * 4) * 0.1;
+                }
             }
         }
 
@@ -267,7 +271,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            if(particleSystem) particleSystem.material.uniforms.uTime.value += 0.02; // Update GPU Time
+            if(particleSystem) particleSystem.material.uniforms.uTime.value += 0.02;
 
             handX += (targetHandX - handX) * 0.1; handY += (targetHandY - handY) * 0.1;
 
@@ -279,13 +283,14 @@
             else if (currentMode === 2) rotationAngle += 0.02;
             else if (currentMode === 3) rotationAngle += 0.015;
             else if (currentMode === 4) rotationAngle -= 0.01;
-            else if (currentMode === 6) rotationAngle += 0.03; // Putaran pusaran bunga lumayan cepat
+            else if (currentMode === 6) rotationAngle += 0.02; 
             
             if (currentMode === 5) {
                 particleSystem.rotation.y = Math.sin(Date.now() * 0.001) * 0.2; particleSystem.rotation.x = 0;
             } else {
                 particleSystem.rotation.y = rotationAngle;
                 if (currentMode === 4) particleSystem.rotation.x = 0;
+                if (currentMode === 6) particleSystem.rotation.x = 0.2; // Sedikit menunduk biar mawar terlihat jelas
             }
 
             if (currentMode !== 1) { particleSystem.position.x = handX; particleSystem.position.y = handY; } 
@@ -335,7 +340,6 @@
         function onResults(results) {
             const spideyImg = document.getElementById('spidey-overlay');
             const loveImg = document.getElementById('love-overlay');
-            const roseImg = document.getElementById('rose-overlay');
             const iloveyouText = document.getElementById('iloveyou-overlay');
             const label = document.getElementById('mode-label');
             const statusText = document.getElementById('status-text');
@@ -351,6 +355,7 @@
                 const landmarks = results.multiHandLandmarks[0];
                 currentMode = hitungModeGestur(landmarks);
 
+                // Menggambar Tulang & Sendi Tangan
                 canvasCtx.save();
                 canvasCtx.strokeStyle = 'white'; canvasCtx.lineWidth = 4;
                 for (const conn of HAND_CONNECTIONS) {
@@ -364,6 +369,7 @@
                 }
                 canvasCtx.restore();
 
+                // Manajemen Musik & SFX
                 if (currentMode !== lastMode) {
                     if (currentMode === 4) { thwipSfx.currentTime = 0; thwipSfx.play().catch(e=>{}); }
                     
@@ -383,9 +389,10 @@
                 targetHandX = (0.5 - wrist.x) * 10; targetHandY = (0.5 - wrist.y) * 8;
                 const screenX = (1 - wrist.x) * window.innerWidth, screenY = wrist.y * window.innerHeight;
 
-                spideyImg.style.display = "none"; loveImg.style.display = "none"; roseImg.style.display = "none"; iloveyouText.style.display = "none";
+                spideyImg.style.display = "none"; loveImg.style.display = "none"; iloveyouText.style.display = "none";
                 const matUniforms = particleSystem.material.uniforms;
 
+                // Logika Warna dan Label per Mode
                 if (currentMode === 1) {
                     targetPos = posSpace; label.innerText = "KOSMOS TERBUKA";
                     matUniforms.uColor.value.setHex(0x00d2ff); matUniforms.uColorHighlight.value.setHex(0xffffff); ubahWarnaTeksMode("#00d2ff", "#3a7bd5");
@@ -405,12 +412,10 @@
                     matUniforms.uColor.value.setHex(0xff66ff); matUniforms.uColorHighlight.value.setHex(0xffffff); ubahWarnaTeksMode("#ff66ff", "#cc33ff");
                     iloveyouText.style.display = "block"; iloveyouText.style.left = `${screenX}px`; iloveyouText.style.top = `${screenY}px`;
                 } else if (currentMode === 6) {
-                    // MODE BARU: BUNGA MAWAR
                     targetPos = posRose; label.innerText = "BUNGA MAWAR";
-                    matUniforms.uColor.value.setHex(0x00ff66); // Partikel Hijau (Daun/Tangkai)
-                    matUniforms.uColorHighlight.value.setHex(0xff0033); // Kilau Merah (Kelopak)
+                    matUniforms.uColor.value.setHex(0xff0033); // Merah kelopak
+                    matUniforms.uColorHighlight.value.setHex(0x00ff66); // Hijau tangkai
                     ubahWarnaTeksMode("#ff0033", "#00ff66");
-                    roseImg.style.display = "block"; roseImg.style.left = `${screenX}px`; roseImg.style.top = `${screenY}px`;
                 }
             } else {
                 statusText.style.display = 'block'; statusText.innerText = "Arahkan tangan ke kamera";
@@ -446,6 +451,7 @@
 
         initThree();
 
+        // LOGIKA TOMBOL MULAI & INPUT NAMA
         document.getElementById('start-btn').addEventListener('click', function() {
             const inputVal = document.getElementById('name-input').value.trim();
             customName = inputVal !== "" ? inputVal : "SAYANG";
