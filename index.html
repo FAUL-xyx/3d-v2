@@ -318,7 +318,7 @@
             return new THREE.CanvasTexture(canvas);
         }
 
-        function initThree() {
+                function initThree() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 12;
@@ -337,15 +337,78 @@
             geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.BufferAttribute(currentPos, 3));
 
-            // --- UPDATE: Pasang tekstur glowing ke material partikel ---
-            const material = new THREE.PointsMaterial({ 
-                color: 0x00d2ff, 
-                size: 0.4, // Ukuran diperbesar sedikit agar efek glowing-nya lebih terasa
-                transparent: true, 
-                opacity: 0.9,
-                map: createGlowingTexture(), // <-- Ini yang mengubah kotak jadi bulatan glowing
-                depthWrite: false,           // <-- Ini memastikan partikel tidak ada tepi kotak hitam yang saling menutupi
-                blending: THREE.AdditiveBlending 
+            // --- FITUR BARU: ShaderMaterial untuk partikel level "mantap" ---
+            
+            // 1. Uniforms: Data yang dikirim dari JS ke Shader (per piksel/per vertikal)
+            const uniforms = {
+                uTime: { value: 0 },
+                uColor: { value: new THREE.Color(0x00d2ff) }, // Warna dasar
+                uColorHighlight: { value: new THREE.Color(0xffffff) } // Warna kerlip terang
+            };
+
+            // 2. Vertex Shader: Mengontrol posisi dan ukuran vertikal di GPU
+            const vertexShader = `
+                uniform float uTime;
+                varying vec3 vPosition;
+                varying float vDistance;
+
+                void main() {
+                    vPosition = position;
+                    
+                    // Efekdenyut ukuran dinamis berdasarkan waktu dan posisi
+                    float pulse = 0.8 + 0.2 * sin(uTime * 3.0 + position.x * 2.0);
+                    
+                    // Jarak vertikal dari kamera untuk efek blur/halus di GPU
+                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    vDistance = -mvPosition.z;
+                    
+                    // Ukuran diperbesar dan dikalikan efek denies
+                    gl_PointSize = (12.0 * pulse) * (50.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `;
+
+            // 3. Fragment Shader: Mengontrol warna dan transparansi per piksel di GPU
+            const fragmentShader = `
+                uniform float uTime;
+                uniform vec3 uColor;
+                uniform vec3 uColorHighlight;
+                varying vec3 vPosition;
+                varying float vDistance;
+
+                void main() {
+                    // Buat tekstur glowing bulat sempurna di GPU
+                    vec2 coord = gl_PointCoord - vec2(0.5);
+                    float d = length(coord);
+                    
+                    // Efek halus (blur) di pinggir partikel berdasarkan jarak
+                    float blur = smoothstep(0.5, 0.5 - (0.1 / vDistance), d);
+                    
+                    // Efekkerlip warna (twinkle) dinamis berdasarkan waktu dan posisi
+                    float twinkle = 0.7 + 0.3 * sin(uTime * 10.0 + vPosition.y * 5.0);
+                    
+                    // Blend warna dasar dengan warna kerlip terang
+                    vec3 finalColor = mix(uColor, uColorHighlight, (1.0 - twinkle) * 0.5);
+                    
+                    // Aplikasikan warna, kerlip, dan transparansi (alpha)
+                    gl_FragColor = vec4(finalColor, (1.0 - smoothstep(0.0, 0.5, d)) * twine);
+                    
+                    // Aplikasikan efek halus/blur di GPU
+                    gl_FragColor.a *= blur;
+                    
+                    // Hapus piksel di luar area glowing
+                    if (gl_FragColor.a < 0.05) discard;
+                }
+            `;
+
+            // 4. Bikin material menggunakan ShaderMaterial
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                transparent: true,
+                depthWrite: false, // Penting agar tidak ada tepi kotak hitam yang saling menutupi
+                blending: THREE.AdditiveBlending
             });
             
             particleSystem = new THREE.Points(geometry, material);
@@ -354,6 +417,7 @@
             window.addEventListener('resize', onWindowResize);
             animate();
         }
+
 
 
         function generateBaseShapes() {
