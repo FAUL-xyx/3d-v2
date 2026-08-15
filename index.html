@@ -127,15 +127,36 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             z-index: 10;
             display: none; 
+            /* Tambahan property biar canvas posisinya pas */
+            width: 130px;
+            height: 95px;
         }
 
         #webcam {
-            width: 130px;
-            height: 95px;
+            width: 100%;
+            height: 100%;
             transform: scaleX(-1);
             border-radius: 12px;
             object-fit: cover;
             display: block;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 130px;
+            height: 95px;
+        }
+
+        /* --- CANVAS UNTUK TRACKING TULANG TANGAN --- */
+        #output_canvas {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 130px;
+            height: 95px;
+            transform: scaleX(-1);
+            border-radius: 12px;
+            z-index: 11; /* Harus di atas webcam */
+            pointer-events: none;
         }
 
         /* --- PANDUAN GESTUR KIRI BAWAH --- */
@@ -144,7 +165,7 @@
             bottom: 25px;
             left: 25px;
             z-index: 15;
-            display: none; /* Muncul setelah tombol mulai diklik */
+            display: none; 
         }
 
         #guide-btn {
@@ -354,6 +375,7 @@
 
     <div id="webcam-container">
         <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="output_canvas" width="480" height="360"></canvas>
     </div>
 
     <script>
@@ -366,6 +388,16 @@
         let targetHandX = 0, targetHandY = 0;
         let handX = 0, handY = 0;
         let rotationAngle = 0;
+
+        // Titik koneksi rangka tangan (sesuai standar MediaPipe)
+        const HAND_CONNECTIONS = [
+            [0,1],[1,2],[2,3],[3,4], // Jempol
+            [0,5],[5,6],[6,7],[7,8], // Telunjuk
+            [5,9],[9,10],[10,11],[11,12], // Tengah
+            [9,13],[13,14],[14,15],[15,16], // Manis
+            [13,17],[17,18],[18,19],[19,20], // Kelingking
+            [0,17] // Telapak Bawah
+        ];
 
         function initThree() {
             scene = new THREE.Scene();
@@ -565,6 +597,10 @@
             modeLabel.style.webkitTextFillColor = "transparent";
         }
 
+        // Variabel untuk Canvas Tracking
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+
         function onResults(results) {
             const spideyImg = document.getElementById('spidey-overlay');
             const loveImg = document.getElementById('love-overlay');
@@ -573,11 +609,43 @@
             const statusText = document.getElementById('status-text');
             const bgMusic = document.getElementById('bg-music');
 
+            // --- HAPUS CANVAS SEBELUM DIGAMBAR ULANG ---
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 statusText.style.display = 'none'; 
                 
                 const landmarks = results.multiHandLandmarks[0];
                 currentMode = hitungModeGestur(landmarks);
+
+                // --- MENGGAMBAR TRACKING TULANG TANGAN (SKELTON) ---
+                canvasCtx.save();
+                
+                // 1. Gambar Garis (Tulang) - Warna Putih Tebal
+                canvasCtx.strokeStyle = 'white';
+                canvasCtx.lineWidth = 4;
+                for (const conn of HAND_CONNECTIONS) {
+                    const p1 = landmarks[conn[0]];
+                    const p2 = landmarks[conn[1]];
+                    canvasCtx.beginPath();
+                    canvasCtx.moveTo(p1.x * canvasElement.width, p1.y * canvasElement.height);
+                    canvasCtx.lineTo(p2.x * canvasElement.width, p2.y * canvasElement.height);
+                    canvasCtx.stroke();
+                }
+
+                // 2. Gambar Titik (Sendi) - Merah dengan outline Putih
+                canvasCtx.fillStyle = '#ff0033'; 
+                canvasCtx.strokeStyle = 'white';
+                canvasCtx.lineWidth = 2;
+                for (let i = 0; i < landmarks.length; i++) {
+                    const p = landmarks[i];
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(p.x * canvasElement.width, p.y * canvasElement.height, 5, 0, 2 * Math.PI);
+                    canvasCtx.fill();
+                    canvasCtx.stroke();
+                }
+                canvasCtx.restore();
+                // ----------------------------------------------------
 
                 if (currentMode === 3 || currentMode === 5) {
                     if (bgMusic.paused) {
